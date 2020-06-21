@@ -34,91 +34,82 @@
 	<script src="https://unpkg.com/vue"></script>
 	<script src="https://unpkg.com/vue-material"></script>
 	<script>
-    class LookUpForm {
-	  static submit (event) {
-        event.preventDefault()
+/* global Vue */
 
-        let text = event.target.words.value
-        let output = document.getElementById('output')
+class LinkBuilder {
+  constructor (text) {
+    this.text = text
+  }
 
-        output.innerHTML = new LinkBuilder(text).links().map((link) => JSON.stringify(link)).join('\n')
-      }
+  words () {
+    if (this.text === '') return []
+
+    const cleaned = this.text.split('\n')
+      .map((line) => line.trim().toLowerCase())
+    const set = new Set(cleaned)
+    const unique = Array.from(set.keys())
+
+    return unique
+  }
+
+  links () {
+    return this.words()
+      .map((word) => (new AslLink(word).all()))
+      .flat()
+  }
+}
+
+class AslLink {
+  constructor (word) {
+    this.word = word
+  }
+
+  all () {
+    return [
+      this.lifeprint(), this.signasl()
+    ]
+  }
+
+  lifeprint () {
+    const firstLetter = this.word[0]
+    const escaped = encodeURIComponent(this.word)
+
+    return {
+      source: 'Lifeprint',
+      href: `http://www.lifeprint.com/asl101//pages-signs/${firstLetter}/${escaped}.htm`,
+      imageUrl: `http://www.lifeprint.com/asl101//gifs/${firstLetter}/${escaped}.gif`,
+      text: this.word
     }
+  }
 
-    class LinkBuilder {
-      constructor (text) {
-        this.text = text
-      }
+  signasl (word) {
+    const escaped = encodeURIComponent(this.word)
 
-      words () {
-        if (this.text === "") return []
-
-        let cleaned = this.text.split('\n').
-          map((line) => line.trim().toLowerCase())
-        let set = new Set(cleaned)
-        let unique = Array.from(set.keys())
-
-        return unique
-      }
-
-      links () {
-        return this.words().
-          map((word) => (new AslLink(word).all())).
-          flat()
-      }
+    return {
+      source: 'SignASL',
+      href: `https://www.signasl.org/sign/${escaped}`,
+      text: this.word
     }
+  }
+}
 
-    class AslLink {
-      constructor (word) {
-        this.word = word
-      }
-
-      all () {
-        return [
-          this.lifeprint(), this.signasl()
-        ]
-      }
-
-      lifeprint () {
-        let firstLetter = this.word[0]
-        let escaped = encodeURIComponent(this.word)
-
-        return {
-          source: "Lifeprint",
-          href: `http://www.lifeprint.com/asl101//pages-signs/${firstLetter}/${escaped}.htm`,
-          imageUrl: `http://www.lifeprint.com/asl101//gifs/${firstLetter}/${escaped}.gif`,
-          text: this.word
-        }
-      }
-
-      signasl (word) {
-        let escaped = encodeURIComponent(this.word)
-
-        return {
-          source: "SignASL",
-          href: `https://www.signasl.org/sign/${escaped}`,
-          text: this.word
-        }
-      }
+const _app = new Vue({
+  el: '#app',
+  data: {
+    text: ''
+  },
+  methods: {
+    submit () {
+      console.log('submit')
     }
-
-    const _app = new Vue({
-      el: '#app',
-      data: {
-        text: ""
-      },
-      methods: {
-        submit() {
-          console.log("submit")
-        }
-      },
-      computed: {
-        links () {
-          let linkBuilder = new LinkBuilder(this.text)
-          return linkBuilder.links()
-        }
-      }
-    })
+  },
+  computed: {
+    links () {
+      const linkBuilder = new LinkBuilder(this.text)
+      return linkBuilder.links()
+    }
+  }
+})
 	</script>
 </body>
 
