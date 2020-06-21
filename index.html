@@ -1,15 +1,90 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Look Up ASL</title>
-  <meta charset="UTF-8">
-  <meta name="description" content="American Sign Language lookup">
-  <meta name="theme-color" content="#448aff">
-  <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
+	<title>Look Up ASL</title>
+	<meta charset="UTF-8">
+	<meta name="description" content="American Sign Language lookup">
+	<meta name="theme-color" content="#448aff">
+	<meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
 </head>
+
 <body>
-  <main id="app">
-    <h1>Hello world</h1>
-  </main>
+	<main id="app">
+		<h1>Look Up ASL</h1>
+		<p>Enter words to look up signs for</p>
+		<form onsubmit="LookUpForm.submit(event)">
+			<textarea name="words" rows="10">moon</textarea><br>
+			<input type="submit">
+		</form>
+		<pre id="output"></pre>
+	</main>
+    <script>console.log('loaded')</script>
+	<script>
+    class LookUpForm {
+	  static submit (event) {
+        event.preventDefault()
+
+        let text = event.target.words.value
+        let output = document.getElementById('output')
+
+        output.innerHTML = new LinkBuilder(text).links().map((link) => JSON.stringify(link)).join('\n')
+      }
+    }
+
+    class LinkBuilder {
+      constructor (text) {
+        this.text = text
+      }
+
+      words () {
+        let cleaned = this.text.split('\n').
+          map((line) => line.trim().toLowerCase())
+        let set = new Set(cleaned)
+        let unique = Array.from(set.keys())
+
+        return unique
+      }
+
+      links () {
+        return this.words().
+          map((word) => (new AslLink(word).all())).
+          flat()
+      }
+    }
+
+    class AslLink {
+      constructor (word) {
+        this.word = word
+      }
+
+      all () {
+        return [
+          this.lifeprint(), this.signasl()
+        ]
+      }
+
+      lifeprint () {
+        let firstLetter = this.word[0]
+        let escaped = encodeURIComponent(this.word)
+
+        return {
+          href: `http://www.lifeprint.com/asl101//pages-signs/${firstLetter}/${escaped}.htm`,
+          imageUrl: `http://www.lifeprint.com/asl101//gifs/${firstLetter}/${escaped}.gif`,
+          text: this.word
+        }
+      }
+
+      signasl (word) {
+        let escaped = encodeURIComponent(this.word)
+
+        return {
+          href: `https://www.signasl.org/sign/${escaped}`,
+          text: this.word
+        }
+      }
+    }
+	</script>
 </body>
+
 </html>
