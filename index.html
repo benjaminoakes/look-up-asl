@@ -13,13 +13,26 @@
 	<main id="app">
 		<h1>Look Up ASL</h1>
 		<p>Enter words to look up signs for</p>
-		<form onsubmit="LookUpForm.submit(event)">
-			<textarea name="words" rows="10">moon</textarea><br>
+		<form @submit.prevent="submit">
+			<textarea v-model="text" rows="10"></textarea><br>
 			<input type="submit">
 		</form>
-		<pre id="output"></pre>
+
+        <h2>Results</h2>
+        <ul>
+          <li v-for="link in links" :key="link.href">
+            <a :href="link.href">
+              {{ link.source }}: {{ link.text }}
+            </a>
+            <br>
+
+            <img width="300" height="300" v-if="link.imageUrl" :src="link.imageUrl">
+          </li>
+        </ul>
 	</main>
     <script>console.log('loaded')</script>
+	<script src="https://unpkg.com/vue"></script>
+	<script src="https://unpkg.com/vue-material"></script>
 	<script>
     class LookUpForm {
 	  static submit (event) {
@@ -38,6 +51,8 @@
       }
 
       words () {
+        if (this.text === "") return []
+
         let cleaned = this.text.split('\n').
           map((line) => line.trim().toLowerCase())
         let set = new Set(cleaned)
@@ -69,6 +84,7 @@
         let escaped = encodeURIComponent(this.word)
 
         return {
+          source: "Lifeprint",
           href: `http://www.lifeprint.com/asl101//pages-signs/${firstLetter}/${escaped}.htm`,
           imageUrl: `http://www.lifeprint.com/asl101//gifs/${firstLetter}/${escaped}.gif`,
           text: this.word
@@ -79,11 +95,30 @@
         let escaped = encodeURIComponent(this.word)
 
         return {
+          source: "SignASL",
           href: `https://www.signasl.org/sign/${escaped}`,
           text: this.word
         }
       }
     }
+
+    const _app = new Vue({
+      el: '#app',
+      data: {
+        text: ""
+      },
+      methods: {
+        submit() {
+          console.log("submit")
+        }
+      },
+      computed: {
+        links () {
+          let linkBuilder = new LinkBuilder(this.text)
+          return linkBuilder.links()
+        }
+      }
+    })
 	</script>
 </body>
 
