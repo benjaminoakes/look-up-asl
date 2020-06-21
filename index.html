@@ -48,8 +48,9 @@ class LinkBuilder {
       .map((line) => line.trim().toLowerCase())
     const set = new Set(cleaned)
     const unique = Array.from(set.keys())
+    const sorted = unique.sort()
 
-    return unique
+    return sorted
   }
 
   links () {
