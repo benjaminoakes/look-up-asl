@@ -27,6 +27,7 @@
             <br>
 
             <img width="300" height="300" v-if="link.imageUrl" :src="link.imageUrl">
+            <video controls width="300" height="300" v-if="link.videoUrl" :src="link.videoUrl">
           </li>
         </ul>
 	</main>
@@ -89,6 +90,7 @@ class AslLink {
     return {
       source: 'SignASL',
       href: `https://www.signasl.org/sign/${escaped}`,
+      videoUrl: `https://media.signbsl.com/videos/asl/startasl/mp4/${escaped}.mp4`,
       text: this.word
     }
   }
@@ -97,7 +99,7 @@ class AslLink {
 const _app = new Vue({
   el: '#app',
   data: {
-    text: ''
+    text: 'tiger'
   },
   methods: {
     submit () {
