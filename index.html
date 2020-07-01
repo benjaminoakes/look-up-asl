@@ -26,8 +26,9 @@
             </a>
             <br>
 
-            <img width="300" height="300" v-if="link.imageUrl" :src="link.imageUrl">
-            <video controls width="300" height="300" v-if="link.videoUrl" :src="link.videoUrl">
+            <img width="300" height="300" v-if="link.imageUrl" :src="link.imageUrl" onerror="this.remove()">
+            <img width="300" height="300" v-if="link.otherImageUrl" :src="link.otherImageUrl" onerror="this.remove()">
+            <video controls width="320" height="240" v-if="link.videoUrl" :src="link.videoUrl">
           </li>
         </ul>
 	</main>
@@ -80,6 +81,7 @@ class AslLink {
       source: 'Lifeprint',
       href: `http://www.lifeprint.com/asl101//pages-signs/${firstLetter}/${escaped}.htm`,
       imageUrl: `http://www.lifeprint.com/asl101//gifs/${firstLetter}/${escaped}.gif`,
+      otherImageUrl: `http://www.lifeprint.com/asl101//gifs-animated/${escaped}.gif`,
       text: this.word
     }
   }
